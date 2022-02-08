@@ -12,7 +12,7 @@ class AssetsGenOptions {
   bool get enable => _enable;
 
   /// output file path
-  String _output = 'assets.dart';
+  String _output = 'generated/assets.dart';
 
   String get output => _output;
 
@@ -35,6 +35,17 @@ class AssetsGenOptions {
 
   /// 是否忽略分辨率variant
   bool _ignoreResolution = true;
+
+  /// case
+  /// [snake, camel]
+  CaseFormat _caseFormat = CaseFormat.snake;
+
+  CaseFormat get caseFormat => _caseFormat;
+
+  /// include ext
+  bool _includeExtension = true;
+
+  bool get includeExtension => _includeExtension;
 
   /// 忽略的文件/文件夹
   /// 支持glob语法
@@ -69,6 +80,13 @@ class AssetsGenOptions {
     }
     if (json['plurals'] is List) {
       _plurals = (json['plurals'] as List).map((e) => e.toString()).toList();
+    }
+    if (json['include_extension'] is bool) {
+      _includeExtension = json['include_extension'];
+    }
+    if (json['case_format'] is String) {
+      _caseFormat = CaseFormat.values.firstWhere((element) =>
+          element.toString().split('.').last == json['case_format']);
     }
   }
 
@@ -119,4 +137,9 @@ class AssetsGenOptions {
       }
     }
   }
+}
+
+enum CaseFormat {
+  snake,
+  camel,
 }

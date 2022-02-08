@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:assets_gen/src/options.dart';
 import 'package:build/build.dart' hide log;
 import 'package:path/path.dart' as p;
 
 import 'asset.dart';
 import 'log.dart';
+import 'package:recase/recase.dart';
+
 import 'pubspec.dart';
 
 void generate(PubSpec pubspec) {
@@ -88,12 +91,18 @@ String genContent(PubSpec pubspec, Iterable<Asset> assets) {
       if (pathSegments.isNotEmpty) {
         pathSegments = pathSegments
             .sublist(min(pubspec.options.omitPathLevels, pathSegments.length));
-        key = p.join(p.joinAll(pathSegments), p.basename(key));
+        key = p.join(
+            p.joinAll(pathSegments),
+            pubspec.options.includeExtension
+                ? p.basename(key)
+                : p.basenameWithoutExtension(key));
       }
     }
     // 替换非法字符
     key = key.replaceAll('/', '_').replaceAll('-', '_').replaceAll('.', '_');
-
+    if (pubspec.options.caseFormat == CaseFormat.camel) {
+      key = key.camelCase;
+    }
     if (asset.isPlural) {
       Iterable<Match>? matches;
       if (key.contains('**')) {
